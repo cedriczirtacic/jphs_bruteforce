@@ -2,6 +2,7 @@
 Patch for jphide bruteforcing
 
 ## Steps to reproduce
+0) Get `jphs` first!
 1) Unzip `jpegsr9a.zip`
 2) Patch `Makefile` and `jpseek.c`
 3) `make` (`make clean` if compiled before making the changes)
