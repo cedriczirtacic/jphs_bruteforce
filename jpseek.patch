@@ -1,0 +1,49 @@
+--- jpseek.c.old	2018-06-12 15:44:24.000000000 -0600
++++ jpseek.c	2018-06-12 18:20:52.000000000 -0600
+@@ -25,6 +25,7 @@
+ #include "version.h"
+ 
+ #define NKSTREAMS 4
++#define PASSLEN 120
+ 
+ static jvirt_barray_ptr * coef_arrays;
+ static unsigned int  cpos[NKSTREAMS];
+@@ -205,7 +206,7 @@
+   return (1);
+  }	
+ 
+- if ((f = open(seekfilename,O_WRONLY|O_TRUNC|O_CREAT)) < 0) {
++ if ((f = open(seekfilename,O_WRONLY|O_TRUNC|O_CREAT, 0700)) < 0) {
+   perror("Can't open seek file");
+   return (1);
+  }
+@@ -232,10 +233,27 @@
+   iv[i] = (((short**)(((void**)(((void**)coef_arrays)[0]))[0]))[0])[i]; 
+  }
+ 
+- pass = getpass("Passphrase: ");
++ if (getenv("JPSEEK_STDIN") == NULL) {
++    pass = getpass("Passphrase: ");
++ } else {
++    pass = malloc(PASSLEN);
++    memset(pass, 0, PASSLEN);
++    fgets(pass, PASSLEN-1, stdin);
++    
++    // clean newlines
++    char *ptr = pass;
++    while (*ptr != '\0') {
++        if (*ptr == '\n' || *ptr == '\r') {
++            *ptr = '\0';
++            break;
++        }
++        ptr++;
++    }
++ }
+  if (strlen(pass) == 0) {
+   fprintf(stderr,"Nothing done\n");
+-  exit(0);
++  free(pass);
++  exit(1);
+  }  
+  if (strlen(pass) > 120) {
+   fprintf(stderr,"Truncated to 120 characters\n");
