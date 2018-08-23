@@ -20,7 +20,7 @@ while read pass;do
     if [ $? -eq 0 ];then
         echo "PASSWORD: $pass"
         file output
-        if [ ! $CONT_AFTER_EXIT0 ];then
+        if [ $CONT_AFTER_EXIT0 == false ];then
             exit 0;
         fi
     fi
